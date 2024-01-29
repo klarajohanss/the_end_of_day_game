@@ -3,42 +3,56 @@ set title: 'The End of Day Game', background: 'navy'
 set resizable: true
 #Image.new('img/background_og.png')
 
-skeleton_idle = Sprite.new(
-  'img/Idle.png',
+skeleton_animation = Sprite.new(
+  'img/skeleton_all_animations.png',
   clip_width: 128,
-  time: 300,
+  time: 200,
+  width: 128,
+  height: 128,
   x:0, y:300,
-  loop: true
+  animations: {
+    idle: 1..6,
+    walk: 7..14,
+    attack: 15..18,
+    jump: 19..28,
+    hurt: 29..31,
+    dead: 32..34,
+  }
 )
 
+skeleton_default = (skeleton_animation.play animation: :idle, loop: true)
 
-skeleton_walk = Sprite.new(
-  'img/Walk.png',
-  clip_width: 128,
-  time: 300,
-  x:0, y:300,
-  loop: true
-)
 
-skeleton_idle.play
+
+def main()
+  skeleton_default
+
+
+end
+
+on :key_held do |event|
+  case event.key
+    when 'a'
+      skeleton_animation.play animation: :walk, loop: true, flip: :horizontal
+    when 'd'
+      skeleton_animation.play animation: :walk, loop: true
+  end
+end
 
 on :key_down do |event|
-  if event.key == 'd'
-    # Hide Idle sprite and show Walk sprite when 'd' key is pressed
-    skeleton_idle.remove
-    skeleton_walk.play
+  case event.key
+    when 'w'
+      skeleton_animation.play animation: :jump, loop: nil
+    when 'p'
+      skeleton_animation.play animation: :attack, loop: nil
+    when 'h'
+      skeleton_animation.play animation: :hurt, loop: nil
+    when 'j'
+      skeleton_animation.play animation: :dead, loop: nil
   end
 end
 
-# Key release event handler
-on :key_up do |event|
-  if event.key == 'd'
-    # Hide Walk sprite and show Idle sprite when 'd' key is released
-    skeleton_walk.remove
-    skeleton_idle.play
-  end
-end
+
 
 
 show
-
