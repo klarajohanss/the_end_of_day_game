@@ -1,15 +1,20 @@
 require 'ruby2d'
 set title: 'The End of Day Game', background: 'navy'
 set resizable: true
-#Image.new('img/background_og.png')
+set width: 800
+set height: 600
+background = Image.new(
+  'img/background_real.png',
+  height: 600,
+)
 
 
 skeleton_animation = Sprite.new(
   'img/skeleton_all_animations.png',
   clip_width: 128,
   time: 200,
-  width: 128,
-  height: 128,
+  width: 192,
+  height: 192,
   x:0, y:300,
   animations: {
     idle: 1..6,
@@ -49,7 +54,7 @@ end
 on :key_down do |event|
   case event.key
     when 'a'
-      skeleton_animation.play animation: :walk, loop: true, flip: :horizontal
+      skeleton_animation.play animation: :walk, loop: true, flip: :horizontal 
       walking_left = true
       facing_left = true
     when 'd'
@@ -77,11 +82,11 @@ on :key_down do |event|
 end
 
 update do
-  if walking_right
+  if walking_right && skeleton_animation.x < (Window.width - 150)#skeleton_animation.width)
     # Move the character horizontally according to its walking velocity
     skeleton_animation.x += walk_velocity
   end
-  if walking_left
+  if walking_left && skeleton_animation.x > -50
     # Move the character horizontally according to its walking velocity
     skeleton_animation.x -= walk_velocity
   end
