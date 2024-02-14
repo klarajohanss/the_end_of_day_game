@@ -53,3 +53,19 @@ on :key_held do |event|
 end
 
 show
+
+
+
+#old "key_up" event
+case event.key
+when 'w'
+  skeleton_animation.play animation: :idle, loop: true
+when'p','h'
+  skeleton_animation.play animation: :idle, loop: true
+when 'j'
+  skeleton_animation.play animation: :dead, loop: nil #fix animation for dead dead
+when 'a', 'd'
+  skeleton_animation.play animation: :idle, loop: true
+  walking_left = false
+  walking_right = false
+end
