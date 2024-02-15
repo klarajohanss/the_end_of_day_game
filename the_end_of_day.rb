@@ -10,10 +10,12 @@ walking_right = false
 walking_left = false
 facing_left = false
 
+#score and lives
+score = 0
+lives = 5
+
 #game not started
 game_started = false
-
-#sprites not existing
 
 #skeleton sprite
 skeleton_animation = Sprite.new(
@@ -33,8 +35,7 @@ skeleton_animation = Sprite.new(
   }
 )
 
-#skeleton initially idles
-skeleton_animation.play animation: :idle, loop: true
+
 
 #intro screen
 intro_text1 = Text.new(
@@ -47,7 +48,6 @@ intro_text1 = Text.new(
   #rotate: 90,
   z: 5
 )
-
 intro_text2 = Text.new(
   'by Klara Johansson',
   x: 250, y: 185,
@@ -58,7 +58,6 @@ intro_text2 = Text.new(
   #rotate: 90,
   z: 5
 )
-
 intro_text3 = Text.new(
   'press any key to start',
   x: 350, y: 315,
@@ -70,17 +69,53 @@ intro_text3 = Text.new(
   z: 5
 )
 
+#lives
+heart1 = Image.new(
+  'img/heart.png',
+  x: 735, y:540, z: 5,
+  width: 46, height: 43,
+)
+heart2 = Image.new(
+  'img/heart.png',
+  x: 689, y:540, z: 5,
+  width: 46, height: 43, 
+)
+heart3 = Image.new(
+  'img/heart.png',
+  x: 643, y:540, z: 5,
+  width: 46, height: 43, 
+)
+heart4 = Image.new(
+  'img/heart.png',
+  x: 597, y:540, z: 5,
+  width: 46, height: 43, 
+)
+heart5 = Image.new(
+  'img/heart.png',
+  x: 551, y:540, z: 5,
+  width: 46, height: 43, 
+)
+
+#hearts are not shown
+heart1.remove
+heart2.remove
+heart3.remove
+heart4.remove
+heart5.remove
+
 
 #main update loop
 update do
   if !game_started
+    #skeleton initially idles
+    skeleton_animation.play animation: :idle, loop: true
     on :key_down do |event|
       intro_text1.remove
       intro_text2.remove
       intro_text3.remove
       game_started = true
     end
-  elsif game_started
+  else
     
     background = Image.new(
       'img/background_real.png',
@@ -88,6 +123,53 @@ update do
      #y: ,
     )
 
+    score_counter = Text.new(
+      "score: #{score}",
+      x: 15, y: 550,
+      font:'img/DigitalDisco.ttf',
+      size: 25,
+      color: 'white',
+      z: 5
+    )
+
+    if lives == 5
+      puts "in the if, lives = 5"
+      heart1.add
+      heart2.add
+      heart3.add
+      heart4.add
+      heart5.add
+    elsif lives == 4
+      heart1.add
+      heart2.add
+      heart3.add
+      heart4.add
+      heart5.remove
+    elsif lives == 3
+      heart1.add
+      heart2.add
+      heart3.add
+      heart4.remove
+      heart5.remove
+    elsif lives == 2
+      heart1.add
+      heart2.add
+      heart3.remove
+      heart4.remove
+      heart5.remove
+    elsif lives == 1
+      heart1.add
+      heart2.remove
+      heart3.remove
+      heart4.remove
+      heart5.remove
+    else 
+      heart1.remove
+      heart2.remove
+      heart3.remove
+      heart4.remove
+      heart5.remove
+    end
 
     on :key_up do |event|
       walking_left = false
@@ -148,8 +230,6 @@ update do
   end
 
 end
-
-
 
 
 

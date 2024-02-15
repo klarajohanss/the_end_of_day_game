@@ -1,6 +1,8 @@
 require 'ruby2d'
 set title: 'The End of Day Game', background: 'navy'
-set resizable: true
+set resizable: false
+set width: 800
+set height: 600
 
 skeleton_animation = Sprite.new(
   'img/skeleton_all_animations.png',
@@ -19,53 +21,51 @@ skeleton_animation = Sprite.new(
   }
 )
 
-# Set the initial x velocity when walking
-walk_velocity = 2
+lives = 5
 
-on :key_held do |event|
-  case event.key
-    when 'a'
-      skeleton_animation.play animation: :walk, loop: true, flip: :horizontal
-      walking_left = true
-      facing_left = true
-    when 'd'
-      skeleton_animation.play animation: :walk, loop: true
-      walking_right = true
-      facing_left = false
-    when 'w'
-      if facing_left
-        skeleton_animation.play animation: :jump, loop: false, flip: :horizontal
-      else
-        skeleton_animation.play animation: :jump, loop: false
-      end
-      skeleton_animation.y -= 20
-    when 'p'
-      if facing_left
-        skeleton_animation.play animation: :attack, loop: false, flip: :horizontal
-      else
-        skeleton_animation.play animation: :attack, loop: false
-      end
-    when 'h'
-      skeleton_animation.play animation: :hurt, loop: false
-    when 'j'
-      skeleton_animation.play animation: :dead, loop: nil
+heart1 = Image.new(
+  'img/heart.png',
+  x: 735, y:540, z: 5,
+  width: 46, height: 43,
+)
+heart2 = Image.new(
+  'img/heart.png',
+  x: 689, y:540, z: 1,
+  width: 46, height: 43, 
+)
+heart3 = Image.new(
+  'img/heart.png',
+  x: 643, y:540, z: 1,
+  width: 46, height: 43, 
+)
+heart4 = Image.new(
+  'img/heart.png',
+  x: 597, y:540, z: 1,
+  width: 46, height: 43, 
+)
+heart5 = Image.new(
+  'img/heart.png',
+  x: 551, y:540, z: 1,
+  width: 46, height: 43, 
+)
+update do 
+  if lives == 5
+    heart1.add
+    heart2.add
+    heart3.add
+    heart4.add
+    heart5.add
+  elsif lives == 4
+    heart1.add
+    heart2.add
+    heart3.add
+    heart4.add
+    heart5.remove
   end
+
 end
 
-show
 
 
 
-#old "key_up" event
-case event.key
-when 'w'
-  skeleton_animation.play animation: :idle, loop: true
-when'p','h'
-  skeleton_animation.play animation: :idle, loop: true
-when 'j'
-  skeleton_animation.play animation: :dead, loop: nil #fix animation for dead dead
-when 'a', 'd'
-  skeleton_animation.play animation: :idle, loop: true
-  walking_left = false
-  walking_right = false
-end
+show 
