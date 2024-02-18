@@ -144,6 +144,25 @@ $intro_text3.remove
 
 # Define functions for different aspects of your game
 
+def game_over
+  clear
+  set background: 'navy'
+  $fire_animation.x = 1000
+  $skeleton_animation.add
+  $skeleton_animation.play animation: :dead, loop: nil
+  $game_over_text = Text.new(
+    'Game Over!',
+    x: 200, y: 170,
+    font: 'img/DigitalDisco.ttf',
+    #style: 'bold',
+    size: 70,
+    color: 'white',
+    #rotate: 90,
+    z: 5
+  )
+  
+end
+
 def game_introduction
 
   p "gamwe introducinm???"
@@ -295,14 +314,16 @@ def update_game
 
   #skeleton takes damage when too close to fire
   if (($skeleton_animation.x - $fire_animation.x).abs < 50)
-
     p "skeleton hurt"
+    if !$attacking
+      $skeleton_animation.play animation: :hurt, loop: false
+    end
     $lives-=2
     i=0
   end
 
   #fire takes damage 
-  if ((($skeleton_animation.x - $fire_animation.x).abs < 100) && $attacking)
+  if ((($skeleton_animation.x - $fire_animation.x).abs < 110) && $attacking)
     p "fire hurt"
     $fire_health -= 1
     $score_scaled +=1
@@ -322,14 +343,17 @@ def update_game
     )
     $score_scaled = 0
   end
-  
-
 
   #fire dies
   if $fire_health<1
     $fire_animation.remove
     $fire_animation.x = 1000
     $fire_animation.y = -1000
+  end
+
+  #skeleton dies
+  if $lives<0
+    game_over
   end
 
   #skeleton movements
