@@ -123,6 +123,8 @@ heart3.remove
 heart4.remove
 heart5.remove
 
+fire_start = true
+
 
 #main update loop
 update do
@@ -136,6 +138,17 @@ update do
       game_started = true
     end
   else
+    #fire_animation.play animation: :explosion, loop: true
+
+    if fire_start
+      fire_animation.add
+      #fire_animation.play animation: :explosion, loop: true
+      fire_start = false
+    end
+
+
+
+
     
     background = Image.new(
       'img/background_real.png',
@@ -161,17 +174,17 @@ update do
       z: 5
     )
 
-    fire_animation.add
-
     #printing skeleton coordinates
     on :key_down do |event|
       case event.key
         when 'l'
-          #p skeleton_animation.x
+          p skeleton_animation.x
           #p fire_animation.x 
           p (skeleton_animation.x - fire_animation.x).abs
       end
     end
+
+
 
     #tracking lives
     if lives == 5
@@ -255,8 +268,30 @@ update do
       end
     end
 
+    p skeleton_animation.x
     update do
+      if 1>0
+        p "in this stiupoid if"
+        fire_animation.play animation: :explosion, loop: true
+      end
+      if ((skeleton_animation.x - fire_animation.x).abs < 190)
+        p "in the if"
+        fire_animation.play animation: :explosion, loop: true
+      else
+        fire_animation.play animation: :idle, loop: false
+      end
+      p "iun the update do first"
+    
+      #fire sprite explode when close to skeleton
+      
+
+    end
+
+    update do
+      "in the seconmd update do"
+
       if walking_right && skeleton_animation.x < (Window.width - 150)#skeleton_animation.width)
+        p "iun the wlaking right if"
         # Move the character horizontally according to its walking velocity
         skeleton_animation.x += walk_velocity
       elsif walking_right && skeleton_animation.x >= (Window.width - 150) && ((background.x - Window.width) > -background.width)
@@ -272,13 +307,15 @@ update do
       end
     end
 
-    #fire sprite explode when close to skeleton
-    if ((skeleton_animation.x - fire_animation.x).abs < 190)
-      p "in the if"
-      fire_animation.play animation: :explosion, loop: true
-    else
-      fire_animation.play animation: :idle, loop: true
+    update do
+      if 1>0
+        p "stupid testoing"
+      end
+
     end
+
+
+
     
 
   end
