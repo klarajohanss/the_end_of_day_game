@@ -1,4 +1,5 @@
 require 'ruby2d'
+p "program starting"
 
 #defining global variables
 
@@ -19,10 +20,12 @@ $skeleton_animation = Sprite.new(
     dead: 32..34,
   }
 )
+p "here"
 
 
 #variables for initial game settings
 $score = 0
+$score_scaled = 0
 $lives = 0
 $level = 1
 $walk_velocity = 2
@@ -82,6 +85,17 @@ $heart3.remove
 $heart4.remove
 $heart5.remove
 
+
+#score counter updates
+$score_counter = Text.new(
+  "score: #{$score}",
+  x: 15, y: 550,
+  font:'img/DigitalDisco.ttf',
+  size: 25,
+  color: 'white',
+  z: 5
+)
+
 #level
 $level_text = Text.new(
   "Level #{$level}",
@@ -92,17 +106,6 @@ $level_text = Text.new(
   z: 5
 )
 $level_text.remove
-
-#score counter
-$score_counter = Text.new(
-  "score: #{$score}",
-  x: 15, y: 550,
-  font:'img/DigitalDisco.ttf',
-  size: 25,
-  color: 'white',
-  z: 5
-)
-$score_counter.remove
 
 #intro texts
 $intro_text1 = Text.new(
@@ -126,7 +129,7 @@ $intro_text2 = Text.new(
   z: 5
 )
 $intro_text3 = Text.new(
-  'press any key to start',
+  'click to continue',
   x: 350, y: 315,
   font: 'img/DigitalDisco.ttf',
   #style: 'bold',
@@ -143,6 +146,7 @@ $intro_text3.remove
 
 def game_introduction
 
+  p "gamwe introducinm???"
   set background: 'navy'
 
   $intro_text1.add
@@ -156,6 +160,7 @@ end
 
 def initialize_game
   # Initialize game settings, sprites, variables, etc.
+  p "ititilize??"
 
   $lives = 500
 
@@ -300,13 +305,31 @@ def update_game
   if ((($skeleton_animation.x - $fire_animation.x).abs < 100) && $attacking)
     p "fire hurt"
     $fire_health -= 1
+    $score_scaled +=1
   end
+
+  #updating score
+  if $score_scaled >= 50
+    $score += 50
+    $score_counter.remove
+    $score_counter = Text.new(
+      "score: #{$score}",
+      x: 15, y: 550,
+      font:'img/DigitalDisco.ttf',
+      size: 25,
+      color: 'white',
+    	z: 5
+    )
+    $score_scaled = 0
+  end
+  
 
 
   #fire dies
   if $fire_health<1
     $fire_animation.remove
-
+    $fire_animation.x = 1000
+    $fire_animation.y = -1000
   end
 
   #skeleton movements
@@ -359,19 +382,21 @@ game_started = false
 game_introduction
 if !game_started
   p "inly once"
-  on :key_down do |event|
+  on :mouse_down do |event|
+    p "whateve"
     $intro_text1.remove
     $intro_text2.remove
     $intro_text3.remove
     initialize_game
+    game_started = true
   end
-  game_started = true
+  
 end
-
 
 
 # Main update loop
 update do
+  #p "in the main update do"
   # Call the update function to handle game logic
   update_game
 
