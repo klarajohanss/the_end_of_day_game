@@ -29,8 +29,8 @@ $walk_velocity = 2
 $walking_right = false
 $walking_left = false
 $facing_left = false
-$attacking = false
-$fire_health = 280
+# Define variables to track the direction of skeleton movement
+$skeleton_movement_direction = nil
 
 #fire sprite
 $fire_animation = Sprite.new(
@@ -157,7 +157,7 @@ end
 def initialize_game
   # Initialize game settings, sprites, variables, etc.
 
-  $lives = 500
+  $lives = 5
 
   $background = Image.new(
     'img/background_real.png',
@@ -182,31 +182,31 @@ def update_game
   # Update game state, handle input, move sprites, check collisions, etc.
 
   #tracking amount of lives
-  if $lives > 400
+  if $lives == 5
     $heart1.add
     $heart2.add
     $heart3.add
     $heart4.add
     $heart5.add
-  elsif $lives > 300
+  elsif $lives == 4
     $heart1.add
     $heart2.add
     $heart3.add
     $heart4.add
     $heart5.remove
-  elsif $lives > 200
+  elsif $lives == 3
     $heart1.add
     $heart2.add
     $heart3.add
     $heart4.remove
     $heart5.remove
-  elsif $lives > 100
+  elsif $lives == 2
     $heart1.add
     $heart2.add
     $heart3.remove
     $heart4.remove
     $heart5.remove
-  elsif $lives > 0
+  elsif $lives == 1
     $heart1.add
     $heart2.remove
     $heart3.remove
@@ -223,17 +223,7 @@ def update_game
   #skeleton default mode
   on :key_up do |event|
     case event.key
-      when 'a','d'
-        #p "225"
-        $walking_left = false
-        $walking_right = false
-        if $facing_left
-          $skeleton_animation.play animation: :idle, loop: true, flip: :horizontal
-        else
-          $skeleton_animation.play animation: :idle, loop: true
-        end
-      when 'p'
-        $attacking = false
+      when 'a','d','p'
         $walking_left = false
         $walking_right = false
         if $facing_left
@@ -248,12 +238,10 @@ def update_game
   on :key_down do |event|
     case event.key
       when 'a'
-        #p "240"
         $skeleton_animation.play animation: :walk, loop: true, flip: :horizontal 
         $walking_left = true
         $facing_left = true
       when 'd'
-        #p "245"
         $skeleton_animation.play animation: :walk, loop: true
         $walking_right = true
         $facing_left = false
@@ -265,7 +253,6 @@ def update_game
         end
         $skeleton_animation.y -= 20
       when 'p'
-        $attacking = true
         if $facing_left
           $skeleton_animation.play animation: :attack, loop: false, flip: :horizontal
         else
@@ -285,63 +272,44 @@ def update_game
     #p "in the if"
     $fire_animation.play animation: :explosion, loop: true
   else
-    $fire_animation.play animation: :idle, loop: true
+    $fire_animation.play animation: :idle, loop: false
   end
 
-  #skeleton takes damage when too close to fire
-  if (($skeleton_animation.x - $fire_animation.x).abs < 50)
+  # Define variables to track the direction of skeleton movement
+$skeleton_movement_direction = nil
 
-    p "skeleton hurt"
-    $lives-=2
-    i=0
-  end
+# Update the skeleton movement direction based on the direction the skeleton is moving
+if $walking_right
+  $skeleton_movement_direction = :right
+elsif $walking_left
+  $skeleton_movement_direction = :left
+end
 
-  #fire takes damage 
-  if ((($skeleton_animation.x - $fire_animation.x).abs < 100) && $attacking)
-    p "fire hurt"
-    $fire_health -= 1
-  end
-
-
-  #fire dies
-  if $fire_health<1
-    $fire_animation.remove
-
-  end
-
-  #skeleton movements
-  if $walking_right && $skeleton_animation.x < (Window.width - 150)#skeleton_animation.width)
-    # Move the character horizontally according to its walking velocity
-    #p "283"
+# Move the skeleton based on the skeleton movement direction
+case $skeleton_movement_direction
+when :right
+  if $skeleton_animation.x < (Window.width - 150)
+    # Move the skeleton to the right
     $skeleton_animation.x += $walk_velocity
-    background_moving_right = false
-  elsif $walking_right && $skeleton_animation.x >= (Window.width - 150) && (($background.x - Window.width) > -$background.width)
-    #p "286"
-    background_moving_right = true
+  else
+    # Move the background to the left
+    $background.x -= $walk_velocity if $background.x > -($background.width - Window.width)
     $level_text.x -= $walk_velocity
     $fire_animation.x -= $walk_velocity
   end
-
-  if $walking_left && $skeleton_animation.x > -50
-    #p "293"
-    # Move the character horizontally according to its walking velocity
+when :left
+  if $skeleton_animation.x > -50
+    # Move the skeleton to the left
     $skeleton_animation.x -= $walk_velocity
-    background_moving_left = false
-  elsif $walking_left && $skeleton_animation.x <= -50 && ($background.x <= -3)
-    #p "298"
-    background_moving_left = true
+  else
+    # Move the background to the right
+    $background.x += $walk_velocity if $background.x < 0
     $level_text.x += $walk_velocity
     $fire_animation.x += $walk_velocity
   end
+end
 
-  #background movements
-  if background_moving_right
-    #p "306"
-    $background.x -= $walk_velocity
-  elsif background_moving_left
-    #p "309"
-    $background.x += $walk_velocity
-  end
+
 
 
 end
@@ -352,22 +320,16 @@ end
 
 # Set up the window and other initial configurations
 set title: 'The End of Day Game', resizable: false, width: 800, height: 600
-game_started = false
 
 
 # Call the initialization function to set up the game
 game_introduction
-if !game_started
-  p "inly once"
-  on :key_down do |event|
-    $intro_text1.remove
-    $intro_text2.remove
-    $intro_text3.remove
-    initialize_game
-  end
-  game_started = true
+on :key_down do |event|
+  $intro_text1.remove
+  $intro_text2.remove
+  $intro_text3.remove
+  initialize_game
 end
-
 
 
 # Main update loop
@@ -381,3 +343,15 @@ end
 
 # Start the game loop
 show
+
+
+
+
+new_delay=""
+delay="srngsrutnbgserougnesiurghseiuruhgsieug3465978263tfubnsebgw34nyt894w2n7tyf89n230t09456t2345vn6n350tyc7536y90764b5djm45789tycn7se89ny0vvt94w"
+i=0
+while i<delay.length
+  #p "in the whiol"
+  new_delay+=delay[i]
+  i+=1
+end
