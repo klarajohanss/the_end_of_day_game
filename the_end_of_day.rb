@@ -10,12 +10,16 @@ walking_right = false
 walking_left = false
 facing_left = false
 
-#score and lives
+#inital game settings
 score = 0
 lives = 5
+level = 1
 
 #game not started
 game_started = false
+
+#fire sprite variables
+fire_default = true
 
 #skeleton sprite
 skeleton_animation = Sprite.new(
@@ -24,9 +28,9 @@ skeleton_animation = Sprite.new(
   time: 200,
   width: 192,
   height: 192,
-  x:0, y:300, z:10,
+  x:0, y:300, z:15,
   animations: {
-    idle: 1..6,
+    idle: 0..6,
     walk: 7..14,
     attack: 15..18,
     jump: 19..28,
@@ -35,7 +39,23 @@ skeleton_animation = Sprite.new(
   }
 )
 
-
+#fire sprite
+fire_animation = Sprite.new(
+  'img/fire_all_animations.png',
+  clip_width: 128,
+  time: 200,
+  width: 192,
+  height: 192,
+  x:480, y:315, z:10,
+  animations: {
+    idle: 0..5,
+    hurt: 6..8,
+    explosion: 9..19,
+    dead: 20..25,
+    attack: 26..39,
+  }
+)
+fire_animation.remove
 
 #intro screen
 intro_text1 = Text.new(
@@ -120,9 +140,18 @@ update do
     background = Image.new(
       'img/background_real.png',
       height: 600,
-     #y: ,
     )
 
+    level = Text.new(
+      "Level #{level}",
+      x: 40, y:400,
+      font:'img/DigitalDisco.ttf',
+      size: 30,
+      color: 'blue',
+      z: 5
+    )
+
+    #tracking score
     score_counter = Text.new(
       "score: #{score}",
       x: 15, y: 550,
@@ -132,8 +161,20 @@ update do
       z: 5
     )
 
+    fire_animation.add
+
+    #printing skeleton coordinates
+    on :key_down do |event|
+      case event.key
+        when 'l'
+          #p skeleton_animation.x
+          #p fire_animation.x 
+          p (skeleton_animation.x - fire_animation.x).abs
+      end
+    end
+
+    #tracking lives
     if lives == 5
-      puts "in the if, lives = 5"
       heart1.add
       heart2.add
       heart3.add
@@ -209,6 +250,8 @@ update do
          skeleton_animation.play animation: :hurt, loop: false
         when 'j'
          skeleton_animation.play animation: :dead, loop: nil
+        when 'e'
+          fire_animation.play animation: :explosion, loop: true
       end
     end
 
@@ -218,15 +261,26 @@ update do
         skeleton_animation.x += walk_velocity
       elsif walking_right && skeleton_animation.x >= (Window.width - 150) && ((background.x - Window.width) > -background.width)
         background.x -= walk_velocity
+        level.x -= walk_velocity
       end
       if walking_left && skeleton_animation.x > -50
         # Move the character horizontally according to its walking velocity
         skeleton_animation.x -= walk_velocity
       elsif walking_left && skeleton_animation.x <= -50 && (background.x <= -3)
         background.x += walk_velocity
+        level.x += walk_velocity
       end
     end
+
+    #fire sprite explode when close to skeleton
+    if ((skeleton_animation.x - fire_animation.x).abs < 190)
+      p "in the if"
+      fire_animation.play animation: :explosion, loop: true
+    else
+      fire_animation.play animation: :idle, loop: true
+    end
     
+
   end
 
 end
