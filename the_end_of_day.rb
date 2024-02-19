@@ -14,9 +14,9 @@ $walking_left = false
 $facing_left = false
 $attacking = false
 $fire_health = 280
-game_started = false
 $game_music = Music.new('img/game_music.mp3')
 $game_music.loop = true
+game_started = false
 
 #skeleton sprite
 $skeleton_animation = Sprite.new(
@@ -108,6 +108,19 @@ $score_counter = Text.new(
   z: 5
 )
 
+#game over text
+$game_over_text1 = Text.new(
+  'Game Over!',
+  x: 200, y: 170,
+  font: 'img/DigitalDisco.ttf',
+  #style: 'bold',
+  size: 70,
+  color: 'white',
+  #rotate: 90,
+  z: 5
+)
+$game_over_text1.remove
+
 #level
 $level_text = Text.new(
   "Level #{$level}",
@@ -157,7 +170,7 @@ $intro_text3.remove
 #level cleared text
 $level_cleared_text = Text.new(
   'Level Completed!',
-  x: 200, y: 170,
+  x: 140, y: 170,
   font: 'img/DigitalDisco.ttf',
   #style: 'bold',
   size: 70,
@@ -172,26 +185,14 @@ $level_cleared_text.remove
 def game_over
   #$game_over_music = Music.new('img/game_over_music.mp3')
   $fire_animation.x = 1000
-  $skeleton_animation.add
-  $skeleton_animation.play animation: :dead, loop: nil
   #$game_music.stop
   #$game_over_music.play
   #$game_over_music.loop = true
   set background: 'navy'
-  $game_over_text1 = Text.new(
-    'Game Over!',
-    x: 200, y: 170,
-    font: 'img/DigitalDisco.ttf',
-    #style: 'bold',
-    size: 70,
-    color: 'white',
-    #rotate: 90,
-    z: 5
-  )
+  $game_over_text1.add
   $score_counter.add
   $score_counter.x = 300
   $score_counter.y = 400
-  
   
 end
 
@@ -314,13 +315,6 @@ def update_game
         $skeleton_animation.play animation: :walk, loop: true
         $walking_right = true
         $facing_left = false
-      when 'w' #remove jumping??
-        if $facing_left
-          $skeleton_animation.play animation: :jump, loop: false, flip: :horizontal
-        else
-          $skeleton_animation.play animation: :jump, loop: false
-        end
-        $skeleton_animation.y -= 20
       when 'p'
         $attacking = true
         if $facing_left
@@ -328,12 +322,6 @@ def update_game
         else
           $skeleton_animation.play animation: :attack, loop: false
         end
-      when 'h' #remove hurt when key pressed, add other condition
-        $skeleton_animation.play animation: :hurt, loop: false
-      when 'j'#same as hurt
-        $skeleton_animation.play animation: :dead, loop: nil
-      when 'e' #for testing
-        $fire_animation.play animation: :explosion, loop: true
     end
   end
 
@@ -388,10 +376,21 @@ def update_game
   if $lives<0
     p "in the die"
     $game_music.stop
+    $skeleton_animation.play animation: :dead, loop: true
+    $skeleton_animation.stop
+    $skeleton_animation.remove
+    clear
     $game_over_music = Music.new('img/game_over_music.mp3')
     $game_over_music.play
     $game_over_music.loop = true
-    game_over
+    skeleton_dead = Image.new(
+      'img/skeleton_dead.png',
+      height: (49*1.75), width: (93*1.75),
+      x: 300, y: 280,
+    )
+    update do
+      game_over
+    end
   end
 
   #skeleton wins
@@ -470,6 +469,11 @@ if !game_started
     $intro_text1.remove
     $intro_text2.remove
     $intro_text3.remove
+    $score_counter.remove
+    $game_over_text1.remove
+    $skeleton_animation.x = 0
+    $skeleton_animation.y = 300
+    $level_cleared_text.remove
     initialize_game
     game_started = true
   end
