@@ -3,6 +3,21 @@ p "program starting"
 
 #defining global variables
 
+#variables for initial game settings
+$score = 0
+$score_scaled = 0
+$lives = 0
+$level = 1
+$walk_velocity = 2
+$walking_right = false
+$walking_left = false
+$facing_left = false
+$attacking = false
+$fire_health = 280
+game_started = false
+$game_music = Music.new('img/game_music.mp3')
+$game_music.loop = true
+
 #skeleton sprite
 $skeleton_animation = Sprite.new(
   'img/skeleton_all_animations.png',
@@ -23,21 +38,6 @@ $skeleton_animation = Sprite.new(
 p "here"
 
 
-#variables for initial game settings
-$score = 0
-$score_scaled = 0
-$lives = 0
-$level = 1
-$walk_velocity = 2
-$walking_right = false
-$walking_left = false
-$facing_left = false
-$attacking = false
-$fire_health = 280
-game_started = false
-$game_music = Music.new('img/game_music.mp3')
-$game_music.loop = true
-
 #fire sprite
 $fire_animation = Sprite.new(
   'img/fire_all_animations.png',
@@ -55,6 +55,15 @@ $fire_animation = Sprite.new(
   }
 )
 $fire_animation.remove
+
+#end door
+$end_door = Rectangle.new(
+  x: 1000, y: 370,
+  width: 80, height: 110,
+  color: 'navy',
+  z: 10
+)
+$end_door.remove
 
 #lives
 $heart1 = Image.new(
@@ -145,6 +154,19 @@ $intro_text1.remove
 $intro_text2.remove
 $intro_text3.remove
 
+#level cleared text
+$level_cleared_text = Text.new(
+  'Level Completed!',
+  x: 200, y: 170,
+  font: 'img/DigitalDisco.ttf',
+  #style: 'bold',
+  size: 70,
+  color: 'white',
+  #rotate: 90,
+  z: 5
+)
+$level_cleared_text.remove
+
 # Define functions for different aspects of your game
 
 def game_over
@@ -203,6 +225,7 @@ def initialize_game
   $fire_animation.add
   $score_counter.add
   $level_text.add
+  $end_door.add
 
   $skeleton_animation.play animation: :idle, loop: true
   $fire_animation.play animation: :idle, loop: true
@@ -371,6 +394,25 @@ def update_game
     game_over
   end
 
+  #skeleton wins
+  if $skeleton_animation.x == ($end_door.x - 50) && ($fire_animation.x == 1000)#|| $level_cleared
+    clear
+    #$fire_animation.remove
+    #$fire_animation.x = 1000
+    #$fire_animation.y = -1000
+    #$level_cleared = true
+    $lives = 0
+    $skeleton_animation.add
+    $skeleton_animation.play animation: :idle, loop: true
+    set background: 'navy'
+    $level_cleared_text.remove
+    $level_cleared_text.add
+    $score_counter.add
+    $score_counter.x = 300
+    $score_counter.y = 400
+    
+  end
+
   #skeleton movements
   if $walking_right && $skeleton_animation.x < (Window.width - 150)#skeleton_animation.width)
     # Move the character horizontally according to its walking velocity
@@ -382,6 +424,7 @@ def update_game
     background_moving_right = true
     $level_text.x -= $walk_velocity
     $fire_animation.x -= $walk_velocity
+    $end_door.x -= $walk_velocity
   end
 
   if $walking_left && $skeleton_animation.x > -50
@@ -394,6 +437,7 @@ def update_game
     background_moving_left = true
     $level_text.x += $walk_velocity
     $fire_animation.x += $walk_velocity
+    $end_door.x += $walk_velocity
   end
 
   #background movements
