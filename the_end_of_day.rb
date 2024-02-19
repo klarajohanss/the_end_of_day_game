@@ -1,5 +1,4 @@
 require 'ruby2d'
-p "program starting"
 
 #defining global variables
 
@@ -14,7 +13,7 @@ $walking_left = false
 $facing_left = false
 $attacking = false
 $fire_health = 280
-$game_music = Music.new('img/game_music.mp3')
+$game_music = Music.new('music/game_music.mp3')
 $game_music.loop = true
 game_started = false
 
@@ -35,8 +34,6 @@ $skeleton_animation = Sprite.new(
     dead: 32..34,
   }
 )
-p "here"
-
 
 #fire sprite
 $fire_animation = Sprite.new(
@@ -98,11 +95,11 @@ $heart4.remove
 $heart5.remove
 
 
-#score counter updates
+#score counter
 $score_counter = Text.new(
   "score: #{$score}",
   x: 15, y: 550,
-  font:'img/DigitalDisco.ttf',
+  font:'other/DigitalDisco.ttf',
   size: 25,
   color: 'white',
   z: 5
@@ -112,7 +109,7 @@ $score_counter = Text.new(
 $game_over_text1 = Text.new(
   'Game Over!',
   x: 200, y: 170,
-  font: 'img/DigitalDisco.ttf',
+  font: 'other/DigitalDisco.ttf',
   #style: 'bold',
   size: 70,
   color: 'white',
@@ -121,11 +118,11 @@ $game_over_text1 = Text.new(
 )
 $game_over_text1.remove
 
-#level
+#level text
 $level_text = Text.new(
   "Level #{$level}",
   x: 40, y:400,
-  font:'img/DigitalDisco.ttf',
+  font:'other/DigitalDisco.ttf',
   size: 30,
   color: 'blue',
   z: 5
@@ -136,7 +133,7 @@ $level_text.remove
 $intro_text1 = Text.new(
   'The End of Day',
   x: 180, y: 115,
-  font: 'img/DigitalDisco.ttf',
+  font: 'other/DigitalDisco.ttf',
   #style: 'bold',
   size: 65,
   color: 'white',
@@ -146,7 +143,7 @@ $intro_text1 = Text.new(
 $intro_text2 = Text.new(
   'by Klara Johansson',
   x: 250, y: 185,
-  font: 'img/DigitalDisco.ttf',
+  font: 'other/DigitalDisco.ttf',
   #style: 'bold',
   size: 20,
   color: 'white',
@@ -156,7 +153,7 @@ $intro_text2 = Text.new(
 $intro_text3 = Text.new(
   'click to continue',
   x: 350, y: 315,
-  font: 'img/DigitalDisco.ttf',
+  font: 'other/DigitalDisco.ttf',
   #style: 'bold',
   size: 25,
   color: 'white',
@@ -171,7 +168,7 @@ $intro_text3.remove
 $level_cleared_text = Text.new(
   'Level Completed!',
   x: 140, y: 170,
-  font: 'img/DigitalDisco.ttf',
+  font: 'other/DigitalDisco.ttf',
   #style: 'bold',
   size: 70,
   color: 'white',
@@ -180,14 +177,12 @@ $level_cleared_text = Text.new(
 )
 $level_cleared_text.remove
 
-# Define functions for different aspects of your game
 
+#functions
+
+#game over screen
 def game_over
-  #$game_over_music = Music.new('img/game_over_music.mp3')
   $fire_animation.x = 1000
-  #$game_music.stop
-  #$game_over_music.play
-  #$game_over_music.loop = true
   set background: 'navy'
   $game_over_text1.add
   $score_counter.add
@@ -196,9 +191,8 @@ def game_over
   
 end
 
+#showing introduction screen, adding sprite
 def game_introduction
-
-  p "gamwe introducinm???"
   set background: 'navy'
 
   $intro_text1.add
@@ -210,9 +204,8 @@ def game_introduction
 
 end
 
+#initlizes the game; setting background, adding sprites
 def initialize_game
-  # Initialize game settings, sprites, variables, etc.
-  p "ititilize??"
 
   $lives = 500
 
@@ -221,7 +214,6 @@ def initialize_game
     height: 600, 
   )
   
-  #add sprites and text
   $skeleton_animation.add
   $fire_animation.add
   $score_counter.add
@@ -233,12 +225,8 @@ def initialize_game
 
 end
 
-#def movements
-#end
-
+#main function for updating the game; checking collisions, keyboard interaction, updating variables, etc.
 def update_game
-  # Update game state, handle input, move sprites, check collisions, etc.
-
   #tracking amount of lives
   if $lives > 400
     $heart1.add
@@ -278,11 +266,10 @@ def update_game
     $heart5.remove
   end
 
-  #skeleton default mode
+  #skeleton default mode, and flipping horizontally if nessecary
   on :key_up do |event|
     case event.key
       when 'a','d'
-        #p "225"
         $walking_left = false
         $walking_right = false
         if $facing_left
@@ -306,12 +293,10 @@ def update_game
   on :key_down do |event|
     case event.key
       when 'a'
-        #p "240"
         $skeleton_animation.play animation: :walk, loop: true, flip: :horizontal 
         $walking_left = true
         $facing_left = true
       when 'd'
-        #p "245"
         $skeleton_animation.play animation: :walk, loop: true
         $walking_right = true
         $facing_left = false
@@ -327,7 +312,6 @@ def update_game
 
   #fire exploding when close to skeleton
   if (($skeleton_animation.x - $fire_animation.x).abs < 190)
-    #p "in the if"
     $fire_animation.play animation: :explosion, loop: true
   else
     $fire_animation.play animation: :idle, loop: true
@@ -335,7 +319,6 @@ def update_game
 
   #skeleton takes damage when too close to fire
   if (($skeleton_animation.x - $fire_animation.x).abs < 50)
-    p "skeleton hurt"
     if !$attacking
       $skeleton_animation.play animation: :hurt, loop: false
     end
@@ -345,7 +328,6 @@ def update_game
 
   #fire takes damage 
   if ((($skeleton_animation.x - $fire_animation.x).abs < 110) && $attacking)
-    p "fire hurt"
     $fire_health -= 1
     $score_scaled +=1
   end
@@ -357,7 +339,7 @@ def update_game
     $score_counter = Text.new(
       "score: #{$score}",
       x: 15, y: 550,
-      font:'img/DigitalDisco.ttf',
+      font:'other/DigitalDisco.ttf',
       size: 25,
       color: 'white',
     	z: 5
@@ -374,13 +356,12 @@ def update_game
 
   #skeleton dies
   if $lives<0
-    p "in the die"
     $game_music.stop
     $skeleton_animation.play animation: :dead, loop: true
     $skeleton_animation.stop
     $skeleton_animation.remove
     clear
-    $game_over_music = Music.new('img/game_over_music.mp3')
+    $game_over_music = Music.new('music/game_over_music.mp3')
     $game_over_music.play
     $game_over_music.loop = true
     skeleton_dead = Image.new(
@@ -396,10 +377,6 @@ def update_game
   #skeleton wins
   if $skeleton_animation.x == ($end_door.x - 50) && ($fire_animation.x == 1000)#|| $level_cleared
     clear
-    #$fire_animation.remove
-    #$fire_animation.x = 1000
-    #$fire_animation.y = -1000
-    #$level_cleared = true
     $lives = 0
     $skeleton_animation.add
     $skeleton_animation.play animation: :idle, loop: true
@@ -409,17 +386,13 @@ def update_game
     $score_counter.add
     $score_counter.x = 300
     $score_counter.y = 400
-    
   end
 
-  #skeleton movements
-  if $walking_right && $skeleton_animation.x < (Window.width - 150)#skeleton_animation.width)
-    # Move the character horizontally according to its walking velocity
-    #p "283"
+  #updating skeleton movements
+  if $walking_right && $skeleton_animation.x < (Window.width - 150)
     $skeleton_animation.x += $walk_velocity
     background_moving_right = false
   elsif $walking_right && $skeleton_animation.x >= (Window.width - 150) && (($background.x - Window.width) > -$background.width)
-    #p "286"
     background_moving_right = true
     $level_text.x -= $walk_velocity
     $fire_animation.x -= $walk_velocity
@@ -427,12 +400,9 @@ def update_game
   end
 
   if $walking_left && $skeleton_animation.x > -50
-    #p "293"
-    # Move the character horizontally according to its walking velocity
     $skeleton_animation.x -= $walk_velocity
     background_moving_left = false
   elsif $walking_left && $skeleton_animation.x <= -50 && ($background.x <= -3)
-    #p "298"
     background_moving_left = true
     $level_text.x += $walk_velocity
     $fire_animation.x += $walk_velocity
@@ -441,31 +411,23 @@ def update_game
 
   #background movements
   if background_moving_right
-    #p "306"
     $background.x -= $walk_velocity
   elsif background_moving_left
-    #p "309"
     $background.x += $walk_velocity
   end
 
-
 end
 
-#def draw_game
-  # Draw sprites, UI elements, text, etc.
-#end
-
-# Set up the window and other initial configurations
+#setting window and other initial configurations
 set title: 'The End of Day Game', resizable: false, width: 800, height: 600
 
-
-# Call the initialization function to set up the game
+#calling the game introduction function
 game_introduction
+
+#starting the game by calling the initialize game function, playing music, removing introdction screen
 if !game_started
   $game_music.play
-  p "inly once"
   on :mouse_down do |event|
-    p "whateve"
     $intro_text1.remove
     $intro_text2.remove
     $intro_text3.remove
@@ -477,19 +439,12 @@ if !game_started
     initialize_game
     game_started = true
   end
-  
 end
 
-
-# Main update loop
+#main update loop, calling the update game function
 update do
-  #p "in the main update do"
-  # Call the update function to handle game logic
   update_game
-
-  # Call the draw function to render the game scene
-  #draw_game
 end
 
-# Start the game loop
+#showing the window
 show
